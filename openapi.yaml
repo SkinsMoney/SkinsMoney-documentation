@@ -1,0 +1,541 @@
+openapi: 3.0.3
+info:
+  title: Skinsmoney
+  description: 'SkinsMoney REST API Documentation'
+  version: 1.0.0
+servers:
+  -
+    url: 'https://api.skinsmoney.gg'
+paths:
+  /v1/currencies:
+    get:
+      summary: 'Get supported currencies'
+      operationId: getSupportedCurrencies
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  type: response
+                  data:
+                    -
+                      rate: 1
+                      short_name: $
+                      code: USD
+                      updated_at: '2023-04-27T17:48:41.000000Z'
+                    -
+                      rate: 4.15
+                      short_name: zł
+                      code: PLN
+                      updated_at: '2023-09-01T20:00:02.000000Z'
+                    -
+                      rate: 36.93
+                      short_name: ₴
+                      code: UAH
+                      updated_at: '2023-09-01T12:00:02.000000Z'
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  type:
+                    type: string
+                    example: response
+                  data:
+                    type: array
+                    example:
+                      -
+                        rate: 1
+                        short_name: $
+                        code: USD
+                        updated_at: '2023-04-27T17:48:41.000000Z'
+                      -
+                        rate: 4.15
+                        short_name: zł
+                        code: PLN
+                        updated_at: '2023-09-01T20:00:02.000000Z'
+                      -
+                        rate: 36.93
+                        short_name: ₴
+                        code: UAH
+                        updated_at: '2023-09-01T12:00:02.000000Z'
+                    items:
+                      type: object
+                      properties:
+                        rate:
+                          type: integer
+                          example: 1
+                        short_name:
+                          type: string
+                          example: $
+                        code:
+                          type: string
+                          example: USD
+                        updated_at:
+                          type: string
+                          example: '2023-04-27T17:48:41.000000Z'
+      tags:
+        - Currencies
+      security: []
+  /v1/deposits:
+    post:
+      summary: 'Create new skins deposit'
+      operationId: createNewSkinsDeposit
+      description: ''
+      parameters: []
+      responses:
+        201:
+          description: 'Deposit created successfully'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  type: response
+                  data:
+                    id: 3e1ffc0d-80ae-4931-b1cd-9692938849c0
+                    url: 'https://skinsmoney.gg/deposit/3e1ffc0d-80ae-4931-b1cd-9692938849c0'
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  type:
+                    type: string
+                    example: response
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 3e1ffc0d-80ae-4931-b1cd-9692938849c0
+                      url:
+                        type: string
+                        example: 'https://skinsmoney.gg/deposit/3e1ffc0d-80ae-4931-b1cd-9692938849c0'
+        422:
+          description: 'Validation failed'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  type: error
+                  message: 'validation error'
+                  data:
+                    serviceId:
+                      - 'The service id field is required.'
+                    minValue:
+                      - 'The min value field is required.'
+                    signature:
+                      - 'The signature field is required.'
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  type:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: 'validation error'
+                  data:
+                    type: object
+                    properties:
+                      serviceId:
+                        type: array
+                        example:
+                          - 'The service id field is required.'
+                        items:
+                          type: string
+                      minValue:
+                        type: array
+                        example:
+                          - 'The min value field is required.'
+                        items:
+                          type: string
+                      signature:
+                        type: array
+                        example:
+                          - 'The signature field is required.'
+                        items:
+                          type: string
+      tags:
+        - Deposits
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceId:
+                  type: uuid
+                  description: 'Service ID'
+                  example: d9673074-de13-4b93-8a10-41c6da0cb445
+                minValue:
+                  type: number
+                  description: 'Minimal skins value'
+                  example: 2.37
+                currencyCode:
+                  type: string
+                  description: 'Deposit currency'
+                  example: USD
+                custom:
+                  type: string
+                  description: 'Custom parameter for your integration'
+                  example: '42734'
+                redirectUrl:
+                  type: string
+                  description: 'URL which buyer will be redirected'
+                  example: 'https://skinsmoney.gg'
+                tradeUrl:
+                  type: string
+                  description: "Buyers' TradeURL"
+                  example: 'https://steamcommunity.com/tradeoffer/new/?partner=000&token=xxx'
+                steamId:
+                  type: string
+                  description: "Buyers' STEAMID64"
+                  example: '76561199012591716'
+                signature:
+                  type: string
+                  description: 'Signature hashed in sha256 using parameters in above order + hash key from panel, separated with |'
+                  example: f034f9986ae0fa2e3de3b40fcc378bacf6a5a01d269af841121501f610ddc65b
+              required:
+                - serviceId
+                - minValue
+                - signature
+      security: []
+  '/v1/deposits/{id}':
+    get:
+      summary: 'Show deposit info'
+      operationId: showDepositInfo
+      description: ''
+      parameters:
+        -
+          in: query
+          name: signature
+          description: 'Sha256 hash of Deposit ID combined with hash key from panel, separated with |'
+          example: f034f9986ae0fa2e3de3b40fcc378bacf6a5a01d269af841121501f610ddc65b
+          required: true
+          schema:
+            type: string
+            description: 'Sha256 hash of Deposit ID combined with hash key from panel, separated with |'
+            example: f034f9986ae0fa2e3de3b40fcc378bacf6a5a01d269af841121501f610ddc65b
+      responses:
+        200:
+          description: 'Deposit info'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  type: response
+                  data:
+                    id: acfa958e-c082-4765-8656-53816fe27833
+                    status: generated
+                    min_value: 0.01
+                    real_usd_value: null
+                    commission_taken: null
+                    trade_url: 'https://steamcommunity.com/tradeoffer/new/?partner=000&token=xxx'
+                    steam_id: '76561199012591716'
+                    ipn_status: not_sent
+                    ipns_sent: 0
+                    last_ipn_at: null
+                    custom: hello
+                    redirect_url: 'https://skinsmoney.gg'
+                    traded_at: null
+                    created_at: '2023-03-26T20:24:12.000000Z'
+                    updated_at: '2023-03-26T20:24:12.000000Z'
+                    test_mode: 0
+                    end_value: null
+                    trade_state: 0
+                    service_id: 545d3d61-8afe-40e8-9b20-d6a0c592a724
+                    currency:
+                      rate: 4.36
+                      short_name: zł
+                      code: PLN
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  type:
+                    type: string
+                    example: response
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: acfa958e-c082-4765-8656-53816fe27833
+                      status:
+                        type: string
+                        example: generated
+                      min_value:
+                        type: number
+                        example: 0.01
+                      real_usd_value:
+                        type: string
+                        example: null
+                      commission_taken:
+                        type: string
+                        example: null
+                      trade_url:
+                        type: string
+                        example: 'https://steamcommunity.com/tradeoffer/new/?partner=000&token=xxx'
+                      steam_id:
+                        type: string
+                        example: '76561199012591716'
+                      ipn_status:
+                        type: string
+                        example: not_sent
+                      ipns_sent:
+                        type: integer
+                        example: 0
+                      last_ipn_at:
+                        type: string
+                        example: null
+                      custom:
+                        type: string
+                        example: hello
+                      redirect_url:
+                        type: string
+                        example: 'https://skinsmoney.gg'
+                      traded_at:
+                        type: string
+                        example: null
+                      created_at:
+                        type: string
+                        example: '2023-03-26T20:24:12.000000Z'
+                      updated_at:
+                        type: string
+                        example: '2023-03-26T20:24:12.000000Z'
+                      test_mode:
+                        type: integer
+                        example: 0
+                      end_value:
+                        type: string
+                        example: null
+                      trade_state:
+                        type: integer
+                        example: 0
+                      service_id:
+                        type: string
+                        example: 545d3d61-8afe-40e8-9b20-d6a0c592a724
+                      currency:
+                        type: object
+                        properties:
+                          rate:
+                            type: number
+                            example: 4.36
+                          short_name:
+                            type: string
+                            example: zł
+                          code:
+                            type: string
+                            example: PLN
+      tags:
+        - Deposits
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signature:
+                  type: string
+                  description: ''
+                  example: sit
+              required:
+                - signature
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Deposit ID'
+        example: 3e1ffc0d-80ae-4931-b1cd-9692938849c0
+        required: true
+        schema:
+          type: string
+  /v1/notification:
+    get:
+      summary: 'Notification payload'
+      operationId: notificationPayload
+      description: "This is not an actual endpoint.\nSkinsMoney sends you notification with payload shown here.\nNotification is sent as JSON.\nYou MUST respond to it with HTTP 200 status code, and body must be \"OK\"."
+      parameters: []
+      responses:
+        200:
+          description: 'IPN handled successfully'
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+      tags:
+        - Notification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceId:
+                  type: uuid
+                  description: 'Service ID'
+                  example: 3e1ffc0d-80ae-4931-b1cd-9692938849c0
+                minValue:
+                  type: number
+                  description: 'Minimum trade value, which you specified upon creating deposit'
+                  example: 0.01
+                tradedValue:
+                  type: number
+                  description: 'Actual traded value'
+                  example: 0.24
+                steamId:
+                  type: string
+                  description: "Buyers' STEAMID64"
+                  example: '76561199012591716'
+                transactionId:
+                  type: uuid
+                  description: 'Deposit ID'
+                  example: e1ffc0d-80ae-4931-b1cd-9692938849c0
+                date:
+                  type: string
+                  description: 'Date formatted in ISO8601 format'
+                  example: '2023-03-17T14:09:02+00:00'
+                status:
+                  type: string
+                  description: 'Deposit status'
+                  example: success
+                  enum:
+                    - success
+                    - failure
+                    - waiting
+                    - pending
+                currency:
+                  type: string
+                  description: ''
+                  example: USD
+                ipnAttempt:
+                  type: integer
+                  description: 'IPN delivery attempt'
+                  example: 1
+                isTest:
+                  type: integer
+                  description: 'Is deposit executed in test mode?'
+                  example: 1
+                  enum:
+                    - 0
+                    - 1
+                custom:
+                  type: string
+                  description: 'Custom parameter requested upon deposit create. This field will not be shown if it was omitted on creating deposit'
+                  example: '42734'
+                redirectUrl:
+                  type: string
+                  description: 'Redirect url. This field will not be shown if it was omitted on creating deposit'
+                  example: 'https://skinsmoney.gg'
+                signature:
+                  type: string
+                  description: 'Signature hashed in sha256 using parameters in above order + hash key from panel, separated with |'
+                  example: f034f9986ae0fa2e3de3b40fcc378bacf6a5a01d269af841121501f610ddc65b
+              required:
+                - serviceId
+                - minValue
+                - tradedValue
+                - steamId
+                - transactionId
+                - date
+                - status
+                - currency
+                - ipnAttempt
+                - isTest
+      security: []
+  '/v1/services/{id}/withdraw':
+    get:
+      summary: 'Available service earnings to withdraw'
+      operationId: availableServiceEarningsToWithdraw
+      description: ''
+      parameters:
+        -
+          in: query
+          name: signature
+          description: 'Sha256 hash of Service ID combined with hash key from panel, separated with |'
+          example: f034f9986ae0fa2e3de3b40fcc378bacf6a5a01d269af841121501f610ddc65b
+          required: true
+          schema:
+            type: string
+            description: 'Sha256 hash of Service ID combined with hash key from panel, separated with |'
+            example: f034f9986ae0fa2e3de3b40fcc378bacf6a5a01d269af841121501f610ddc65b
+      responses:
+        200:
+          description: 'Balance to withdraw'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  type: response
+                  data:
+                    usd_value: 123
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  type:
+                    type: string
+                    example: response
+                  data:
+                    type: object
+                    properties:
+                      usd_value:
+                        type: integer
+                        example: 123
+      tags:
+        - Services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signature:
+                  type: string
+                  description: ''
+                  example: qui
+              required:
+                - signature
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Service ID'
+        example: 3e1ffc0d-80ae-4931-b1cd-9692938849c0
+        required: true
+        schema:
+          type: string
+tags:
+  -
+    name: Currencies
+    description: ''
+  -
+    name: Deposits
+    description: ''
+  -
+    name: Notification
+    description: ''
+  -
+    name: Services
+    description: ''
