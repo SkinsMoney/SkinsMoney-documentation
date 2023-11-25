@@ -220,12 +220,12 @@ paths:
         -
           in: query
           name: signature
-          description: 'Sha256 hash of Deposit ID combined with hash key from panel, separated with |'
+          description: 'Sha256 hash of Deposit ID combined with service id and hash key from panel, separated with |'
           example: f034f9986ae0fa2e3de3b40fcc378bacf6a5a01d269af841121501f610ddc65b
           required: true
           schema:
             type: string
-            description: 'Sha256 hash of Deposit ID combined with hash key from panel, separated with |'
+            description: 'Sha256 hash of Deposit ID combined with service id and hash key from panel, separated with |'
             example: f034f9986ae0fa2e3de3b40fcc378bacf6a5a01d269af841121501f610ddc65b
       responses:
         200:
@@ -352,7 +352,7 @@ paths:
                 signature:
                   type: string
                   description: ''
-                  example: sit
+                  example: praesentium
               required:
                 - signature
       security: []
@@ -513,7 +513,7 @@ paths:
                 signature:
                   type: string
                   description: ''
-                  example: qui
+                  example: quisquam
               required:
                 - signature
       security: []
